@@ -1,0 +1,315 @@
+import java.util.*;
+import java.io.*;
+
+public class Multiply{
+
+    private static int randomInt(int size) {
+        Random rand = new Random();
+        int maxval = (1 << size) - 1;
+        return rand.nextInt(maxval + 1);
+    }
+    
+    public static int[] naive(int size, int x, int y) {
+//        System.out.println("why so naive");
+        // YOUR CODE GOES HERE  (Note: Change return statement)
+        //recursive algorithm
+//        System.out.println("calling naive");
+        int[] result = new int[2];
+        
+         
+        String x1 = (Integer.toBinaryString(x));
+        int lengthX1 = x1.length();
+//        System.out.println("x1 is " + x1);
+//        System.out.println("lenghtX1 is " + lengthX1);
+        
+        String y1 = (Integer.toBinaryString(y));
+        int lengthY1 = y1.length();
+//        System.out.println("y1 is " + y1);
+//        System.out.println("lenghtY1 is " + lengthY1);
+        
+        //resetting size if the number of bits are too low to represent x and y
+        
+        if (size < lengthX1){
+            int shiftValue = lengthX1 - size;
+            x1 = x1.substring(shiftValue);
+            x = Integer.parseInt(x1);
+           // x = x >> shiftValue;
+      
+        }
+        
+        if (size < lengthY1){
+            int shiftValue = lengthY1 - size;
+            y1 = y1.substring(shiftValue);
+            y = Integer.parseInt(y1);
+            //y = y >> shiftValue;
+        } 
+        
+        
+        
+    
+        if (size == 1){
+             result[0] = x*y;
+             result[1] = result[1]+1;
+             return result;
+        }
+        
+       
+//        System.out.println("x is " + x);
+//        System.out.println("y is " + y);
+        
+        int m = size/2;
+        
+        //if the size is odd, then we need to set different size for a,c and b,d
+        //however, through my calculations, this function should work 
+        //whether or not size is even or odd
+        //gosh, i am such a genius
+        
+//      int a = (int)(x/(Math.pow(2,(double) m)));
+        int a = x >> m;
+        int b = x%(int)(Math.pow(2, m));
+        int c = y >> m;
+//      int d = y%(int)(Math.pow(2, m));
+        int d = y%(int)(Math.pow(2, m));
+        
+        int[] e = new int[2];
+        int[] f = new int[2];
+        int[] g = new int[2];
+        int[] h = new int[2];
+        
+        if (size%2 == 0){
+            e = naive(m,a,c);
+            f = naive(m,b,d);
+            g = naive(m,b,c);
+            h = naive(m,a,d);
+            result[1] = result[1] + 3*m;
+        }
+        else{
+            e = naive(m+1,a,c);
+            f = naive(m,b,d);
+            g = naive(m+1,b,c);
+            h = naive(m+1,a,d);  
+            result[1] = result[1] + 3*(m+1);
+        }
+        
+        result[0] = (int) ((Math.pow(2,2* (double) m)))*e[0]
+                        + (int) Math.pow(2, (double) m)*(g[0] + h[0]) + f[0];
+//        System.out.println(" res[1] is " + result[1] + ", e[1] is " + e[1] + ", f[1] is " + f[1] + ", g[1] is " + g[1] + ", h[1] is " + h[1]);
+        result[1] = result[1] + e[1] + f[1] + g[1] + h[1];
+//        System.out.println("RESULT AFTER ADDING IS " + result[1]);
+       
+        return result;
+        
+    }
+
+    public static int[] karatsuba(int size, int x, int y) {
+        
+        // YOUR CODE GOES HERE  (Note: Change return statement)
+//        System.out.println("KARATSUBA TIME REEEEEEEEEEEEEEEEEEEEEEEEEE");
+        int[] result = new int[2];
+//         System.out.println("x before  is " + x);
+//        System.out.println("y before is " + y);
+        boolean xNegative = false;
+        boolean yNegative = false;
+
+        if (x < 0){
+            x = x*-1; 
+            xNegative = true;
+        }
+        
+        if (y < 0){
+            y = y*-1;
+            yNegative = true;
+        }
+        
+        String x1 = (Integer.toBinaryString(x));
+        int lengthX1 = x1.length();
+//        System.out.println("x1 is " + x1);
+//        System.out.println("lenghtX1 is " + lengthX1);
+        
+        String y1 = (Integer.toBinaryString(y));
+        int lengthY1 = y1.length();
+//        System.out.println("y1 is " + y1);
+//        System.out.println("lenghtY1 is " + lengthY1);
+        
+        
+        
+        
+        //resetting size if the number of bits are too low to represent x and y
+        
+        if (size < lengthX1){
+            int shiftValue = lengthX1 - size;
+            x1 = x1.substring(shiftValue);
+        //  x = Integer.parseInt(x1);    
+            x = Integer.parseInt(x1, 2);
+           // x = x >> shiftValue;
+      
+        }
+        
+        if (size < lengthY1){
+            int shiftValue = lengthY1 - size;
+            y1 = y1.substring(shiftValue);
+        //  y = Integer.parseInt(y1);    
+            y = Integer.parseInt(y1, 2);
+            //y = y >> shiftValue;
+        } 
+        
+        if (size == 1){
+            if (xNegative == true){
+            x = x*-1; 
+            }
+            
+            if (yNegative == true){
+            y = y*-1;
+            }
+            
+             result[0] = x*y;
+             result[1] = result[1]+1;
+//             System.out.println("returning x*y is " +result[0]);
+             return result;
+        }
+        
+//        System.out.println("size is " + size);
+   
+//        System.out.println("x after  is " + x);
+//        System.out.println("y after is " + y);
+        
+        int m = size/2;
+        
+        int a = x >> m;
+        int b = x%(int)(Math.pow(2, m));
+        
+        if (xNegative == true){
+            a = a*-1;
+            b = b*-1;
+        }
+        
+        
+        int c = y >> m;       
+        int d = y%(int)(Math.pow(2, m));
+        
+        if (yNegative == true){
+            c = c*-1;
+            d = d*-1;
+        }
+        
+//        System.out.println(" m is " + m + ", a=" + a +", b=" + b +", c=" + c +", d=" + d);
+        
+        int[] e = new int[2];
+        int[] f = new int[2];
+        int[] g = new int[2];
+        
+        
+        if (size%2 == 0){
+//            System.out.println("size is even");
+//            System.out.println("DOING KARATSUBA e");
+            e = karatsuba(m,a,c);
+//            System.out.println("RETURNED, E IS " + e[0]);
+//            System.out.println("DOING KARATSUBA f");
+            f = karatsuba(m,b,d);
+//            System.out.println("RETURNED. F IS " + f[0]);
+//            System.out.println("DOING KARATSUBA g");
+            g = karatsuba(m,a-b,c-d);
+//            System.out.println("RETURNED. G IS " + g[0]);
+            result[1] = result[1] + 6*m;
+        }
+        else{
+//            System.out.println("size is odd");
+//            System.out.println("DOING KARATSUBA e");
+            e = karatsuba(m+1,a,c);
+//            System.out.println("RETURNED, E IS " + e[0]);
+//            System.out.println("DOING KARATSUBA f");
+            f = karatsuba(m,b,d);
+//            System.out.println("RETURNED. F IS " + f[0]);
+//            System.out.println("DOING KARATSUBA g");
+            g = karatsuba(m+1,a-b,c-d);  
+//            System.out.println("RETURNED. G IS " + g[0]);
+            result[1] = result[1] + 6*(m+1);
+        }
+//        System.out.println(" res[0] is " + result[0] + ", e[0] is " + e[0] + ", f[0] is " + f[0] + ", g[0] is " + g[0]);
+        result[0] = (int) ((Math.pow(2,2* (double) m)))*e[0]
+                        + (int) Math.pow(2, (double) m)*(e[0] + f[0]- g[0]) + f[0];
+        
+//        System.out.println(" res[1] is " + result[1] + ", e[1] is " + e[1] + ", f[1] is " + f[1] + ", g[1] is " + g[1]);
+        result[1] = result[1] + e[1] + f[1] + g[1];
+//        System.out.println("RESULT[0] AFTER ADDING IS " + result[0]);
+//        System.out.println("RESULT[1] AFTER ADDING IS " + result[1]);
+
+
+//        int returnValue = result[0];
+//        
+//        boolean returnValueNegative = false;
+//        
+//         if (returnValue < 0){
+//            returnValue = returnValue*-1;
+//            returnValueNegative = true;
+//        }
+//        
+//        String rV = (Integer.toBinaryString(returnValue));
+//        int lengthRV = rV.length();
+//        
+//        if (size < rV.length()){
+//            int shiftValue = lengthRV - size;
+//            rV = rV.substring(shiftValue);   
+//            returnValue = Integer.parseInt(rV, 2);
+//
+//        }
+//        
+//        if (returnValueNegative == true){
+//            returnValue = returnValue *-1;
+//        }
+//        
+//        result[0] = returnValue;
+ 
+        return result;
+        
+    }
+    
+      public static void main(String[] args){
+
+        try{
+            System.out.println("DON'T FORGET THE BITSS AT THE END");
+            System.out.println("DON'T");
+            System.out.println("DON'T FORGET THE BITSS AT THE END");
+            System.out.println("DON'T");
+            System.out.println("DON'T FORGET THE BITSS AT THE END");
+            System.out.println("DON'T");System.out.println("DON'T FORGET THE BITSS AT THE END");
+            System.out.println("DON'T");
+            System.out.println("DON'T FORGET THE BITSS AT THE END");
+            System.out.println("DON'T");
+            
+            
+            int maxRound = 20;
+            int maxIntBitSize = 16;
+            for (int size=1; size<=maxIntBitSize; size++) {
+                int sumOpNaive = 0;
+                int sumOpKaratsuba = 0;
+                for (int round=0; round<maxRound; round++) {
+                    int x = randomInt(size);
+                    int y = randomInt(size);
+                    int[] resNaive = naive(size,x,y);
+                    int[] resKaratsuba = karatsuba(size,x,y);
+            
+                    if (resNaive[0] != resKaratsuba[0]) {
+                        throw new Exception("Return values do not match! (x=" + x + "; y=" + y + "; Naive=" + resNaive[0] + "; Karatsuba=" + resKaratsuba[0] + ")");
+                    }
+                    
+                    if (resNaive[0] != (x*y)) {
+                        int myproduct = x*y;
+                        throw new Exception("Evaluation is wrong! (x=" + x + "; y=" + y + "; Your result=" + resNaive[0] + "; True value=" + myproduct + ")");
+                    }
+                    
+                    sumOpNaive += resNaive[1];
+                    sumOpKaratsuba += resKaratsuba[1];
+                }
+                int avgOpNaive = sumOpNaive / maxRound;
+                int avgOpKaratsuba = sumOpKaratsuba / maxRound;
+                System.out.println(size + "," + avgOpNaive + "," + avgOpKaratsuba);
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+   } 
+}
+

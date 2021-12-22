@@ -1,0 +1,96 @@
+import java.util.*;
+import java.io.*;
+
+public class Multiply{
+
+    private static int randomInt(int size) {
+        Random rand = new Random();
+        int maxval = (1 << size) - 1;
+        return rand.nextInt(maxval + 1);
+    }
+    
+    public static int[] naive(int size, int x, int y) {
+        System.out.println("why so naive");
+        // YOUR CODE GOES HERE  (Note: Change return statement)
+        //recursive algorithm
+        int[] result = new int[1];
+        System.out.println("size is " + size + ", x is " + x + ", y is " + y);
+        
+        if (size == 1){
+             result[0] = x*y;
+             System.out.println("result[0] is " + result[0]);
+             System.out.println("result is " + result);
+             return result;
+        }
+        
+        
+        int m = size/2;
+        int a = (int)(x/(Math.pow(2,(double) m)));
+        int b = x%(int)(Math.pow(2, m));
+        int c = (int)(y/(Math.pow(2,(double) m)));
+        int d = y%(int)(Math.pow(2, m));
+        
+        int[] e = naive(m,a,c);
+        int[] f = naive(m,b,d);
+        int[] g = naive(m,b,c);
+        int[] h = naive(m,a,d);
+        
+        result[0] = (int) ((Math.pow(2,2* (double) m)))*e[0]
+                        + (int) Math.pow(2, (double) m)*(g[0] + h[0]) + f[0];
+        
+        
+        
+        return result;
+        
+    }
+
+    public static int[] karatsuba(int size, int x, int y) {
+        
+        // YOUR CODE GOES HERE  (Note: Change return statement)
+        
+        return null;
+        
+    }
+    
+    public static void main(String[] args){
+        System.out.println("LIKE A SUMBODY");
+        try{
+            int maxRound = 20;
+            int maxIntBitSize = 16;
+            for (int size=4; size<=maxIntBitSize; size++) {
+                int sumOpNaive = 0;
+                int sumOpKaratsuba = 0;
+                for (int round=0; round<maxRound; round++) {
+      //              int x = randomInt(size);
+      //              int y = randomInt(size);
+                      int x = 2;
+                      int y = 1;
+      
+                    int[] resNaive = naive(size,x,y);
+                    System.out.println("resNaive is " + resNaive);
+                    System.out.println("resNaive[0] is " + resNaive[0]);
+                    int[] resKaratsuba = karatsuba(size,x,y);
+            
+                    if (resNaive[0] != resKaratsuba[0]) {
+                        throw new Exception("Return values do not match! (x=" + x + "; y=" + y + "; Naive=" + resNaive[0] + "; Karatsuba=" + resKaratsuba[0] + ")");
+                    }
+                    
+                    if (resNaive[0] != (x*y)) {
+                        int myproduct = x*y;
+                        throw new Exception("Evaluation is wrong! (x=" + x + "; y=" + y + "; Your result=" + resNaive[0] + "; True value=" + myproduct + ")");
+                    }
+                    
+                    sumOpNaive += resNaive[1];
+                    sumOpKaratsuba += resKaratsuba[1];
+                }
+                int avgOpNaive = sumOpNaive / maxRound;
+                int avgOpKaratsuba = sumOpKaratsuba / maxRound;
+                System.out.println(size + "," + avgOpNaive + "," + avgOpKaratsuba);
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+   } 
+}
